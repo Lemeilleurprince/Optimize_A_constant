@@ -1,0 +1,72 @@
+Please input from where to start,default input is 0:
+Processing patient:
+1
+IOL in Powers:21.5
+Refraction post operation:0
+Micro_Ajust_UpAndDown!
+Keep original direction!
+Refraction (SE): 0.000 A_constant: 119.052 next step: 0.002
+Keep original direction!
+Refraction (SE): 0.000 A_constant: 119.054 next step: 0.002
+Keep original direction!
+Refraction (SE): 0.000 A_constant: 119.056 next step: 0.002
+Keep original direction!
+Refraction (SE): 0.000 A_constant: 119.058 next step: 0.002
+Downaward!
+Refraction (SE): 0.010 A_constant: 119.060 next step: -0.001
+Upaward!
+Refraction (SE): 0.000 A_constant: 119.059 next step: 0.001
+A_constant_max:119.059
+Keep original direction!
+Refraction (SE): 0.000 A_constant: 119.048 next step: -0.002
+Keep original direction!
+Refraction (SE): 0.000 A_constant: 119.046 next step: -0.002
+Keep original direction!
+Refraction (SE): 0.000 A_constant: 119.044 next step: -0.002
+Keep original direction!
+Refraction (SE): 0.000 A_constant: 119.042 next step: -0.002
+Upaward!
+Refraction (SE): -0.010 A_constant: 119.040 next step: 0.001
+Downaward!
+Refraction (SE): 0.000 A_constant: 119.041 next step: -0.001
+A_constant_min:119.041
+Optimized A_constant :119.0500
+Processing patient:
+2
+IOL in Powers:20.5
+Refraction post operation:-0.25
+Micro_Ajust_UpAndDown!
+Keep original direction!
+Refraction (SE): -0.250 A_constant: 118.472 next step: 0.002
+Keep original direction!
+Refraction (SE): -0.250 A_constant: 118.474 next step: 0.002
+Keep original direction!
+Refraction (SE): -0.250 A_constant: 118.476 next step: 0.002
+Keep original direction!
+Refraction (SE): -0.250 A_constant: 118.478 next step: 0.002
+Keep original direction!
+Refraction (SE): -0.250 A_constant: 118.480 next step: 0.002
+Keep original direction!
+Refraction (SE): -0.250 A_constant: 118.482 next step: 0.002
+Keep original direction!
+Refraction (SE): -0.250 A_constant: 118.484 next step: 0.002
+Keep original direction!
+Refraction (SE): -0.250 A_constant: 118.486 next step: 0.002
+Downaward!
+Refraction (SE): -0.230 A_constant: 118.488 next step: -0.001
+Upaward!
+Refraction (SE): -0.250 A_constant: 118.487 next step: 0.001
+A_constant_max:118.487
+Upaward!
+Refraction (SE): -0.260 A_constant: 118.468 next step: 0.001
+Downaward!
+Refraction (SE): -0.250 A_constant: 118.469 next step: -0.001
+A_constant_min:118.469
+Optimized A_constant :118.4780
+Processing patient:
+3
+IOL in Powers:20.5
+Refraction post operation:0
+no such window: no such window: target window already closed
+from unknown error: web view not found
+  (Session info: chrome=100.0.4896.127)
