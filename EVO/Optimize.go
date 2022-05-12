@@ -55,10 +55,6 @@ func main() {
     }
     // Get all the rows in the Sheet1.
     DataMap := make(map[string]string, 0)
-    err = f.InsertCol("Sheet1", "Q")
-    if err!=nil{
-        panic(err)
-    }
     rows, err := f.GetRows("Sheet1")
 
     for i, row := range rows {
@@ -72,14 +68,14 @@ func main() {
                 DataMap=map[string]string{
                             "TextBoxName":row[0],
                             //"TextBoxID":row[1],
-                            "txtAConstant":"119.390",
+                            "txtAConstant":"118.80",
                             "txtAL":row[1],
                             "txtK1":row[3],
                             "txtK2":row[5],
                             "txtACD":row[2],
                             "txtRefraction":"0",
                             "txtLT":row[10],
-                            //"MainContent_WTW":row[9],
+                            //"txtCCT":row[9],
                             "IOL":row[11],
                             "Ref_PostOP":row[12],
 
@@ -103,6 +99,5 @@ func main() {
             }
         }
     }
-
-
+    wd.Quit()
 }

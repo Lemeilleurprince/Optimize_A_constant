@@ -54,10 +54,6 @@ func main() {
     }
     // Get all the rows in the Sheet1.
     DataMap := make(map[string]string, 0)
-    err = f.InsertCol("Sheet1", "Q")
-    if err!=nil{
-        panic(err)
-    }
     rows, err := f.GetRows("Sheet1")
 
     for i, row := range rows {
@@ -72,7 +68,7 @@ func main() {
                 DataMap=map[string]string{
                             "MainContent_PatientName":row[0],
                             //"MainContent_PatientNo":row[1],
-                            "MainContent_Aconstant":"118.5",
+                            "MainContent_Aconstant":"118.80",
                             "MainContent_Axlength":row[1],
                             "MainContent_MeasuredK1":row[3],
                             "MainContent_MeasuredK2":row[5],
@@ -103,6 +99,5 @@ func main() {
             }
         }
     }
-
-
+    //wd.Quit()
 }

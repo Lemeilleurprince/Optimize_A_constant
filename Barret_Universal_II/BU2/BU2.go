@@ -48,8 +48,7 @@ func FloatRound(f float64, n int) float64 {
     return res
 }
 
-func Ajust(wd selenium.WebDriver, A_constant float64,IOL string,Ref_Post float64, Ref float64)(float64, float64){
-   A_constant = FloatRound(A_constant + Ref_Post - Ref,3)
+func Iterate(wd selenium.WebDriver, A_constant float64,IOL string)(Ref float64){
    Patient_Data, err := wd.FindElement(selenium.ByLinkText, "Patient Data")
    if err != nil {
       //panic(err)
@@ -117,87 +116,26 @@ func Ajust(wd selenium.WebDriver, A_constant float64,IOL string,Ref_Post float64
             }
         } 
    }
-   return Ref, A_constant
+   return Ref
+}
 
+func Ajust(wd selenium.WebDriver, A_constant float64,IOL string,Ref_Post float64, Ref float64)(float64, float64){
+   A_constant = FloatRound(A_constant + Ref_Post - Ref,3)
+   Ref = Iterate(wd, A_constant, IOL)
+   return Ref, A_constant
 }
 
 func Micro_Ajust(wd selenium.WebDriver, A_constant float64, IOL string, _Ref float64, Ref float64,Step float64)(float64,float64, float64){
    A_constant =FloatRound(A_constant + Step,3)
-   Patient_Data, err := wd.FindElement(selenium.ByLinkText, "Patient Data")
-   if err != nil {
-      //panic(err)
-      fmt.Println(err)
-   }
-   if err := Patient_Data.Click(); err != nil {
-        panic(err)
-   }
-
-   btn, err := wd.FindElement(selenium.ByID, "MainContent_Aconstant")
-   if err != nil {
-      //panic(err)
-      fmt.Println(err)
-   }
-   err =  btn.Clear()
-   if err != nil {
-      //panic(err)
-      fmt.Println(err)
-   }
-   err =  btn.SendKeys(strconv.FormatFloat(A_constant,'f', 3, 64))
-   if err != nil {
-      //panic(err)
-      fmt.Println(err)
-   }
-   Calc, err := wd.FindElement(selenium.ByID, "MainContent_Button1")
-   if err != nil {
-      //panic(err)
-      fmt.Println(err)
-   }
-   if err := Calc.Click(); err != nil {
-        panic(err)
-   }
-
-   Formula, err := wd.FindElement(selenium.ByLinkText, "Universal Formula")
-   if err != nil {
-      //panic(err)
-      fmt.Println(err)
-   }
-   if err := Formula.Click(); err != nil {
-        panic(err)
-    }
-
-   t,err :=wd.FindElement(selenium.ByTagName, "tbody")
-   if err != nil {
-      //panic(err)
-      fmt.Println(err)
-   }
-   Results,err :=t.Text()
-   if err != nil {
-     panic(err)
-   }
-   Power_Refs := strings.Split(Results,"\n")
-
-   for i,Power_Ref := range Power_Refs{
-       if i==0 {
-            continue
-        } else {
-            Power_Ref_:=strings.Split(strings.TrimSpace(Power_Ref)," ")
-            Power_ := Power_Ref_[0]
-            Ref_ := Power_Ref_[2]
-            if Power_ == IOL{
-                Ref,_ = strconv.ParseFloat(Ref_,64)
-            }
-        } 
-   }
-
-
+   Ref = Iterate(wd, A_constant, IOL)
    //fmt.Println(_Ref,Ref)
    if _Ref > Ref{
-    _Step := FloatRound(math.Abs(Step)/2,3)
+    _Step := FloatRound(math.Abs(Step)/2,4)
     Step = _Step
     fmt.Println("Upaward!")
     //fmt.Println(Step)
    }else if _Ref < Ref{
-    _Step := FloatRound(math.Abs(Step)/2,3)
+    _Step := FloatRound(math.Abs(Step)/2,4)
     Step = - _Step
     fmt.Println("Downaward!")
     //fmt.Println(Step)
@@ -211,10 +149,51 @@ func Micro_Ajust(wd selenium.WebDriver, A_constant float64, IOL string, _Ref flo
 
 }
 
+func Micro_Ajust_UpAndDown(wd selenium.WebDriver, A_constant float64,IOL string, Ref float64)(float64){
+    fmt.Println("Micro_Ajust_UpAndDown!")
+    A_constant_max,A_constant_min :=A_constant,A_constant
+    Ref0 :=Ref
+    Step := 0.016
+    for{
+        _Ref := Ref
+        Ref, A_constant_max, Step = Micro_Ajust(wd, A_constant_max,IOL, _Ref, Ref, Step) 
+        if _Ref >Ref &&  math.Abs(Step) <=0.001 {
+            _Ref := Ref
+            var A_constant_max0 float64
+            Ref, A_constant_max0, Step = Micro_Ajust(wd, A_constant_max,IOL, _Ref, Ref, Step)
+            if _Ref ==Ref{
+                A_constant_max=A_constant_max0
+            }
+            break
+        }
+        
+    }
+    fmt.Println("A_constant_max:" +strconv.FormatFloat(A_constant_max, 'f', 3, 64))
+
+    Ref = Ref0
+    Step = -0.016
+    for{
+        _Ref := Ref
+        Ref, A_constant_min, Step = Micro_Ajust(wd, A_constant_min,IOL,_Ref, Ref, Step)
+        if _Ref < Ref &&  math.Abs(Step) <=0.001{
+            _Ref := Ref
+            var A_constant_min0 float64
+            Ref, A_constant_min0, Step = Micro_Ajust(wd, A_constant_min,IOL,_Ref, Ref, Step)
+            if _Ref ==Ref{
+                A_constant_min=A_constant_min0
+            }
+            break
+        }
+    }
+    fmt.Println("A_constant_min:" + strconv.FormatFloat(A_constant_min, 'f', 3, 64))
+    A_constant = FloatRound ((A_constant_max+A_constant_min)/2,4)
+    return A_constant
+}
+
 func Get_A_constant(wd selenium.WebDriver, DataMap map[string]string)(A_constant float64) {
     IOL := DataMap["IOL"]
     Ref_PostOP := DataMap["Ref_PostOP"]
-    A_constant, _ = strconv.ParseFloat("119.390",64)
+    A_constant, _ = strconv.ParseFloat(DataMap["MainContent_Aconstant"],64)
     for k,v := range DataMap{
         switch k {
         case "IOL","Ref_PostOP":
@@ -223,6 +202,7 @@ func Get_A_constant(wd selenium.WebDriver, DataMap map[string]string)(A_constant
             Find_Send(wd,k,v)
         }
     }
+   //time.Sleep(15*time.Second)
    Calc, err := wd.FindElement(selenium.ByID, "MainContent_Button1")
    if err != nil {
       //panic(err)
@@ -274,6 +254,10 @@ func Get_A_constant(wd selenium.WebDriver, DataMap map[string]string)(A_constant
    set := ConvertStrSlice2Map(Powers)
    if !InMap(set,IOL){
     fmt.Println("IOL not in Powers")
+    Patient_Data, _:= wd.FindElement(selenium.ByLinkText, "Patient Data")
+    if err := Patient_Data.Click(); err != nil {
+        panic(err)
+    }
     return 0
    }else{
         fmt.Printf("IOL in Powers:%s\n",IOL)
@@ -286,40 +270,20 @@ func Get_A_constant(wd selenium.WebDriver, DataMap map[string]string)(A_constant
                 //fmt.Println(A_constant_)
                 if !(A_constant_ >=112 && A_constant_<=125){
                     fmt.Println("A_constant out of boundary!")
+                    Patient_Data, _:= wd.FindElement(selenium.ByLinkText, "Patient Data")
+                    if err := Patient_Data.Click(); err != nil {
+                        panic(err)
+                    }
                     return 0
                     break
                 }else{
-                    _Ref_D :=FloatRound(Ref_Post - Ref,2)
+                    _Ref_D :=FloatRound(Ref_Post - Ref,3)
                     Ref, A_constant = Ajust(wd, A_constant,IOL,Ref_Post, Ref)
-                    Ref_D := FloatRound(Ref_Post - Ref,2)
+                    Ref_D := FloatRound(Ref_Post - Ref,3)
                     //fmt.Println(_Ref_D,Ref_D)
-                    if math.Abs(Ref_D)<=0.02{
+                    if math.Abs(Ref_D)<=0.020{
                         if Ref_D ==0 {
-                            fmt.Println("Micro_Ajust_UpAndDown!")
-                            A_constant_max,A_constant_min :=A_constant,A_constant
-                            Ref0 :=Ref
-                            Step := 0.002
-                            for{
-                                _Ref := Ref
-                                Ref, A_constant_max, Step = Micro_Ajust(wd, A_constant_max,IOL, _Ref, Ref, Step) 
-                                if _Ref >Ref {
-                                    break
-                                }
-                                
-                            }
-                            fmt.Println("A_constant_max:" +strconv.FormatFloat(A_constant_max, 'f', 3, 64))
-
-                            Ref = Ref0
-                            Step = -0.002
-                            for{
-                                _Ref := Ref
-                                Ref, A_constant_min, Step = Micro_Ajust(wd, A_constant_min,IOL,_Ref, Ref, Step)
-                                if _Ref < Ref {
-                                    break
-                                }
-                            }
-                            fmt.Println("A_constant_min:" + strconv.FormatFloat(A_constant_min, 'f', 3, 64))
-                            A_constant = FloatRound ((A_constant_max+A_constant_min)/2,4)
+                            A_constant = Micro_Ajust_UpAndDown(wd, A_constant, IOL, Ref)
                             break
                         }else if _Ref_D*Ref_D<0 {
                             if Ref_D >0 {
@@ -331,6 +295,7 @@ func Get_A_constant(wd selenium.WebDriver, DataMap map[string]string)(A_constant
                                     Ref, A_constant, Step = Micro_Ajust(wd, A_constant,IOL, _Ref, Ref, Step)
                                     Ref_D = FloatRound(Ref_Post - Ref,2)
                                     if Ref_D ==0 {
+                                        A_constant = Micro_Ajust_UpAndDown(wd, A_constant, IOL, Ref)
                                         break
                                     }
                                     if _Ref > Ref {
@@ -350,6 +315,7 @@ func Get_A_constant(wd selenium.WebDriver, DataMap map[string]string)(A_constant
                                     Ref, A_constant, Step = Micro_Ajust(wd, A_constant,IOL, _Ref, Ref, Step)
                                     Ref_D = FloatRound(Ref_Post - Ref,2)
                                     if Ref_D ==0 {
+                                        A_constant = Micro_Ajust_UpAndDown(wd, A_constant, IOL, Ref)
                                         break
                                     }
                                     if _Ref < Ref {

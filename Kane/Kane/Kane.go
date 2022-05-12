@@ -173,8 +173,10 @@ func Micro_Ajust(wd selenium.WebDriver, A_constant float64, IOL string, _Ref flo
 
 func Get_A_constant(wd selenium.WebDriver, DataMap map[string]string)(A_constant float64) {
    IOL := DataMap["IOL"]
+   if len(IOL)<=2{IOL = IOL +".0"}
+   //fmt.Println(IOL)
    Ref_PostOP := DataMap["Ref_PostOP"]
-   A_constant, _ = strconv.ParseFloat("119.390",64)
+   A_constant, _ = strconv.ParseFloat(DataMap["A-Constant1"],64)
    for k,v := range DataMap{
     switch k {
     case "Sex","IOL","Ref_PostOP":
@@ -237,11 +239,17 @@ func Get_A_constant(wd selenium.WebDriver, DataMap map[string]string)(A_constant
    for Power,Ref := range Power_Refs_Map{
     fmt.Println(Power,Ref)
    }
-   */
+   time.Sleep(10*time.Second)
    //fmt.Println(Powers)
+   */
    set := ConvertStrSlice2Map(Powers)
    if !InMap(set,IOL){
     fmt.Println("IOL not in Powers")
+    Menu, _ := wd.FindElement(selenium.ByCSSSelector, `div[class="form-group submit row"]`)
+    NewPatient, _ := Menu.FindElement(selenium.ByCSSSelector, "div:nth-child(3)")
+    if err := NewPatient.Click(); err != nil {
+        panic(err)
+    }
     return 0
    }else{
         fmt.Printf("IOL in Powers:%s\n",IOL)
@@ -252,14 +260,19 @@ func Get_A_constant(wd selenium.WebDriver, DataMap map[string]string)(A_constant
         for {
                 A_constant_ := FloatRound(A_constant + Ref_Post - Ref,3)
                 //fmt.Println(A_constant_)
-                if !(A_constant_ >=112 && A_constant_<=125){
+                if !(A_constant_ >=110 && A_constant_<=125){
                     fmt.Println("A_constant out of boundary!")
+                    Menu, _ := wd.FindElement(selenium.ByCSSSelector, `div[class="form-group submit row"]`)
+                    NewPatient, _ := Menu.FindElement(selenium.ByCSSSelector, "div:nth-child(3)")
+                    if err := NewPatient.Click(); err != nil {
+                        panic(err)
+                    }
                     return 0
                     break
                 }else{
-                    _Ref_D :=FloatRound(Ref_Post - Ref,2)
+                    _Ref_D :=FloatRound(Ref_Post - Ref,3)
                     Ref, A_constant = Ajust(wd, A_constant,IOL,Ref_Post, Ref)
-                    Ref_D := FloatRound(Ref_Post - Ref,2)
+                    Ref_D := FloatRound(Ref_Post - Ref,3)
                     //fmt.Println(_Ref_D,Ref_D)
                     if math.Abs(Ref_D)<=0.02{
                         if Ref_D ==0 {
@@ -345,7 +358,7 @@ func Get_A_constant(wd selenium.WebDriver, DataMap map[string]string)(A_constant
    if err := NewPatient.Click(); err != nil {
         panic(err)
    }
-   time.Sleep(5*time.Second)
+   //time.Sleep(5*time.Second)
    return A_constant
 }
 

@@ -17,18 +17,6 @@ const (
 
 
 func main() {
-    f, err := excelize.OpenFile("Data.xlsx")
-    if err != nil {
-        fmt.Println(err)
-        return
-    }
-    // Get all the rows in the Sheet1.
-    DataMap := make(map[string]string, 0)
-    err = f.InsertCol("Sheet1", "Q")
-    if err!=nil{
-        panic(err)
-    }
-    rows, err := f.GetRows("Sheet1")
     var n int
     fmt.Println("Please input from where to start,default input is 0:")
     fmt.Scanln(&n)
@@ -60,6 +48,7 @@ func main() {
       fmt.Println("get page faild", err.Error())
       //return
    }
+   time.Sleep(5*time.Second)
    Agree, err := wd.FindElement(selenium.ByCSSSelector, `div[class="btn btn-primary btn_agreement"]`)
    if err != nil {
       //panic(err)
@@ -69,6 +58,14 @@ func main() {
         panic(err)
     }
    time.Sleep(5*time.Second)
+   f, err := excelize.OpenFile("Data.xlsx")
+   if err != nil {
+        fmt.Println(err)
+        return
+    }
+   // Get all the rows in the Sheet1.
+   DataMap := make(map[string]string, 0)
+   rows, err := f.GetRows("Sheet1")
    for i, row := range rows {
         if i>=n{
             if i == 0 {
@@ -80,7 +77,7 @@ func main() {
                 DataMap=map[string]string{
                             "Patient":row[0],
                             "Sex":row[14],
-                            "A-Constant1":"119.390",
+                            "A-Constant1":"118.80",
                             "al-right":row[1],
                             "k1-right":row[3],
                             "k2-right":row[5],
@@ -88,7 +85,6 @@ func main() {
                             "right-target":"0",
                             "lt-right":row[10],
                             //"cct-right":row[],
-                            //"MainContent_WTW":row[9],
                             "IOL":row[11],
                             "Ref_PostOP":row[12],
                         }
